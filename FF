@@ -13,7 +13,7 @@ local bannedUsers = {
     "FM7_5", "si07Ac", "si07Acf", "nan_dihanix", "ptolk1237",
     "Si07AcF76", "si07acf76rrrr", "si07acdd", "Si07Ac8",
     "zl2el", "5xzc8", "FRRW52", "7cz_7", "xmotx511",
-    "xmotx5111", "jfitr7e", "sj3zxx", "FurryxD3565"
+    "xmotx5111", "jfitr7e", "FurryxD3565"
 }
 
 local bannedLookup = {}
