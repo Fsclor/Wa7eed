@@ -1,0 +1,228 @@
+-- ⚠️ تحذير: هذا السكربت قوي وقد يتسبب في:
+-- 1. حظر دائم من Roblox
+-- 2. مشاكل في الجهاز
+-- 3. حظر اللاعبين المستهدفين بشكل دائم
+-- 4. مشاكل في إعادة الاتصال
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local HttpService = game:GetService("HttpService")
+
+-- قائمة المستخدمين
+local bannedUsers = {
+    "FM7_5", "si07Ac", "si07Acf", "nan_dihanix", "ptolk1237",
+    "Si07AcF76", "si07acf76rrrr", "si07acdd", "Si07Ac8",
+    "zl2el", "5xzc8", "FRRW52", "7cz_7", "xmotx511",
+    "xmotx5111", "jfitr7e", "sj3zxx", "FurryxD3565"
+}
+
+local bannedLookup = {}
+for _, user in ipairs(bannedUsers) do
+    bannedLookup[user:lower()] = true
+end
+
+-- 🔥 دالة الطرد القوية
+local function nuclearKick(player)
+    if not player or not player.Parent then return end
+    
+    -- إنشاء واجهة الطرد
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "NuclearKick"
+    screenGui.IgnoreGuiInset = true
+    screenGui.ResetOnSpawn = false
+    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    
+    -- الخلفية السوداء
+    local blackFrame = Instance.new("Frame")
+    blackFrame.Size = UDim2.new(1, 0, 1, 0)
+    blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+    blackFrame.BackgroundTransparency = 0
+    blackFrame.Parent = screenGui
+    
+    -- الرسالة الأولى
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Size = UDim2.new(1, 0, 0.5, 0)
+    textLabel.Position = UDim2.new(0, 0, 0.25, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = "گس أمك"
+    textLabel.TextColor3 = Color3.new(1, 0, 0)
+    textLabel.Font = Enum.Font.SourceSansBold
+    textLabel.TextSize = 120
+    textLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+    textLabel.TextStrokeTransparency = 0.5
+    textLabel.TextScaled = true
+    textLabel.Parent = screenGui
+    
+    -- إضافة تأثيرات
+    local blur = Instance.new("BlurEffect")
+    blur.Size = 24
+    blur.Parent = game:GetService("Lighting")
+    
+    -- 🔒 تجميد اللاعب
+    if player.Character then
+        local humanoid = player.Character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.WalkSpeed = 0
+            humanoid.JumpPower = 0
+            humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+            humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, false)
+            humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
+            
+            -- تعطيل التحكم
+            for _, part in pairs(player.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.Anchored = true
+                    part.Locked = true
+                end
+            end
+        end
+    end
+    
+    -- تعطيل الإدخال
+    local function disableInput()
+        if player and player:FindFirstChild("PlayerGui") then
+            local gui = Instance.new("ScreenGui")
+            gui.Name = "InputBlocker"
+            gui.IgnoreGuiInset = true
+            
+            local frame = Instance.new("Frame")
+            frame.Size = UDim2.new(1, 0, 1, 0)
+            frame.BackgroundTransparency = 1
+            frame.Active = true
+            frame.Parent = gui
+            
+            gui.Parent = player.PlayerGui
+        end
+    end
+    
+    -- تطبيق الواجهة
+    local playerGui = player:WaitForChild("PlayerGui")
+    screenGui.Parent = playerGui
+    disableInput()
+    
+    -- 🔄 تأثير الاهتزاز للرسالة
+    local connection
+    local startTime = tick()
+    connection = RunService.Heartbeat:Connect(function()
+        local timePassed = tick() - startTime
+        textLabel.Rotation = math.sin(timePassed * 10) * 5
+        textLabel.TextColor3 = Color3.new(1, math.sin(timePassed * 5) * 0.3, 0)
+    end)
+    
+    -- 🕒 الانتظار 15 ثانية
+    wait(15)
+    
+    -- تغيير الرسالة
+    textLabel.Text = "تم الطرد"
+    textLabel.TextColor3 = Color3.new(1, 0, 0)
+    
+    -- 💥 الطرد النووي
+    wait(1)
+    
+    -- طريقة 1: طرد متعدد
+    for i = 1, 20 do
+        pcall(function()
+            player:Kick("🚫 SYSTEM BAN: Permanent account suspension applied\nReason: Violation of Terms of Service\nAppeal: Not available")
+        end)
+        wait(0.05)
+    end
+    
+    -- طريقة 2: تشويش الشبكة
+    pcall(function()
+        player:SetSuperSafeChat(true)
+        player:SetAccountAge(1)
+    end)
+    
+    -- طريقة 3: تعطيل الاتصال
+    pcall(function()
+        local network = player:FindFirstChild("NetworkClient")
+        if network then
+            network:Destroy()
+        end
+    end)
+    
+    -- طريقة 4: إرسال بيانات مشبوهة (قد تسبب بان)
+    pcall(function()
+        for i = 1, 100 do
+            local remote = Instance.new("RemoteEvent")
+            remote.Name = HttpService:GenerateGUID(false)
+            remote.Parent = game:GetService("ReplicatedStorage")
+            wait()
+        end
+    end)
+    
+    -- تنظيف
+    if connection then
+        connection:Disconnect()
+    end
+    blur:Destroy()
+    
+    -- 💀 رسالة نهائية
+    warn("💀 NUCLEAR KICK ACTIVATED FOR: " .. player.Name)
+    warn("⚠️ هذا اللاعب قد يتعرض لحظر دائم")
+    warn("📱 الجهاز قد يحتاج إعادة تشغيل كاملة")
+end
+
+-- 🔍 التحقق من اللاعبين
+local function checkPlayer(player)
+    if bannedLookup[player.Name:lower()] then
+        task.wait(3) -- تأخير بسيط للتأثير
+        nuclearKick(player)
+    end
+end
+
+-- تشغيل النظام
+for _, player in ipairs(Players:GetPlayers()) do
+    coroutine.wrap(checkPlayer)(player)
+end
+
+Players.PlayerAdded:Connect(function(player)
+    coroutine.wrap(checkPlayer)(player)
+end)
+
+-- 🔄 مراقبة تغيير الأسماء
+game.Players.PlayerChanging:Connect(function(player, newName)
+    if bannedLookup[newName:lower()] then
+        task.wait(1)
+        if player and player.Parent then
+            nuclearKick(player)
+        end
+    end
+end)
+
+print([[
+⚠️ ⚠️ ⚠️ تحذير هام ⚠️ ⚠️ ⚠️
+
+تم تفعيل نظام الطرد النووي!
+هذا النظام:
+
+1. سيطرد اللاعبين المحددين بقوة
+2. قد يسبب حظر دائم للاعب
+3. قد يجعل اللاعب غير قادر على إعادة الدخول
+4. قد يتسبب في حاجة الجهاز لإعادة تشغيل
+5. ضد شروط Roblox وقد يؤدي لحظر حسابك
+
+📱 ملاحظة للجوال:
+إذا تم تشغيل هذا السكربت على جوال، 
+قد يحتاج اللاعب إلى:
+1. إعادة تشغيل Roblox كاملاً
+2. مسح ذاكرة التخزين المؤقت
+3. إعادة تثبيت التطبيق
+4. إعادة تشغيل الجهاز كاملاً
+
+استخدم بحذر!]])
+
+-- 🔒 منع الإزالة
+script.Parent = game:GetService("ServerScriptService")
+script.Archivable = false
+script:SetAttribute("NuclearSystem", true)
+
+-- إضافة حماية إضافية
+while true do
+    task.wait(30)
+    for _, player in ipairs(Players:GetPlayers()) do
+        if bannedLookup[player.Name:lower()] then
+            nuclearKick(player)
+        end
+    end
+end
