@@ -9,7 +9,7 @@ local LocalPlayer = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 
 -- 🔗 الرابط الذكي الوحيد
-local SMART_SYSTEM_URL = "https://rentry.co/sj3zx_system/raw" -- غير sj3zx_system لرابطك
+local SMART_SYSTEM_URL = "https://raw.githubusercontent.com/Fsclor/Wa7eed/refs/heads/main/ERORR" -- غير sj3zx_system لرابطك
 
 -- 🔐 التوقيع الأمني
 local SYSTEM_SIGNATURE = "SJ3ZX_DELTA_CONTROL_v3.0"
