@@ -4,7 +4,7 @@ local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 
 -- 🔗 ضع رابطك الخام هنا:
-local COMMAND_URL = "https://pastebin.com/raw/XXXXXX"
+local COMMAND_URL = "https://raw.githubusercontent.com/Fsclor/Wa7eed/refs/heads/main/ERORR"
 
 -- الأوامر المدعومة
 local Commands = {
