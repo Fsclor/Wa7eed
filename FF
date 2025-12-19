@@ -6,7 +6,7 @@
 ]=]--
 
 -- ⚠️ غير هذا الرابط فقط إذا كان موقعك مختلف
-local SERVER_URL = "https://3000-i956zaj392y43ygtz2ukg-300f38a6.sg1.manus.computer"
+local SERVER_URL = "https://8f97c976-6ce8-4604-97ca-3c4e5dd2aa63-00-1ru3hkt8vlk56.janeway.replit.dev/"
 
 -- Configuration
 local HEARTBEAT_INTERVAL = 8
