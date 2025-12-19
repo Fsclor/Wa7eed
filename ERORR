@@ -4,7 +4,7 @@ local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 
 -- 🔧 ضع رابط الجيتهاب الخام هنا:
-local GITHUB_RAW_URL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/commands.txt"
+local GITHUB_RAW_URL = "https://raw.githubusercontent.com/Fsclor/Wa7eed/refs/heads/main/ERORR"
 
 -- المسؤولين
 local ADMINS = {
