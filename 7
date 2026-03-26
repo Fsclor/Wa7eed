@@ -1,7 +1,13 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Fsclor/Wa7eed/refs/heads/main/Fares"))()
+local scripts = {
+    "https://raw.githubusercontent.com/Fsclor/Wa7eed/refs/heads/main/Fares",
+    "https://raw.githubusercontent.com/Fsclor/Wa7eed/refs/heads/main/script%20DEDSEC",
+    "https://raw.githubusercontent.com/Fsclor/Wa7eed/refs/heads/main/Chat",
+    "https://raw.githubusercontent.com/Fsclor/Wa7eed/refs/heads/main/Security%20DEDSEC%20v2"
+}
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Fsclor/Wa7eed/refs/heads/main/script%20DEDSEC"))()
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Fsclor/Wa7eed/refs/heads/main/Chat"))()
-
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Fsclor/Wa7eed/refs/heads/main/Security%20DEDSEC%20v2"))()
+for _, url in ipairs(scripts) do
+    pcall(function()
+        loadstring(game:HttpGet(url))()
+    end)
+    task.wait(0.3) -- فاصل بسيط عشان ما يعلق
+end
